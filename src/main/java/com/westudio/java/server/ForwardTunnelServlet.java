@@ -1,11 +1,12 @@
 package com.westudio.java.server;
 
-/**
- * Created with IntelliJ IDEA.
- * User: tonyhe
- * Date: 14-6-19
- * Time: 下午4:41
- * To change this template use File | Settings | File Templates.
- */
-public class ForwardTunnelServlet {
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public class ForwardTunnelServlet extends TunnelServlet {
+
+    @Override
+    protected void doTunnel(HttpServletRequest req, HttpServletResponse res) {
+
+    }
 }
