@@ -1,7 +1,11 @@
 package com.westudio.java.client;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import com.westudio.java.util.Executors;
+import com.westudio.java.util.Numbers;
+
+import java.io.IOException;
+import java.net.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class LocalTunnelClient {
 
@@ -11,6 +15,12 @@ public class LocalTunnelClient {
     private static String host;
     private static String path;
     private static int port;
+
+    private static AtomicBoolean running = new AtomicBoolean(true);
+
+    private static void connect(Socket socket) {
+
+    }
 
     public static void main(String[] args) {
 
@@ -31,7 +41,31 @@ public class LocalTunnelClient {
         path = url.getPath();
 
         while (true) {
+            try (ServerSocket server = new ServerSocket(Numbers.parseInt(args[0]))) {
+                server.setSoTimeout(16);
+                while (running.get()) {
+                    Socket socket = null;
+                    try {
+                        socket = server.accept();
+                    } catch (SocketTimeoutException e) {/**/}
+                    if (socket == null) {
+                        try {
+                            Thread.sleep(16);
+                        } catch (InterruptedException e) {/**/}
+                        continue;
+                    }
+                    socket.setSoTimeout(16);
+                    final Socket socket_ = socket;
+                    Executors.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            connect(socket_);
+                        }
+                    });
+                }
+            } catch (IOException e) {
 
+            }
         }
     }
 }
