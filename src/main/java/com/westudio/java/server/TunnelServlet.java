@@ -1,5 +1,7 @@
 package com.westudio.java.server;
 
+import org.apache.commons.codec.binary.Base64;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -16,7 +18,7 @@ public abstract class TunnelServlet extends HttpServlet {
     public void init() throws ServletException {
         auth = getInitParameter("auth");
         if (auth != null) {
-
+            auth = new String(Base64.encodeBase64(auth.getBytes()));
         }
     }
 
@@ -27,12 +29,17 @@ public abstract class TunnelServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
         String authorization = req.getHeader("Authorization");
 
-        if (auth == null || (authorization != null)) {
+        if (auth == null || (authorization != null &&
+            authorization.toUpperCase().startsWith("BASIC")) &&
+            authorization.substring(6).equals(auth)) {
             doTunnel(req, resp);
         }  else {
-
+            resp.setHeader("WWW-Authenticate",
+                    "Basic realm=\"Pegasus Tunnel\"");
+            resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         }
     }
 }
