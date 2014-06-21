@@ -1,12 +1,5 @@
 package com.westudio.java.util;
 
-/**
- * Created with IntelliJ IDEA.
- * User: tonyhe
- * Date: 14-6-20
- * Time: 下午1:59
- * To change this template use File | Settings | File Templates.
- */
 public abstract class Lazy<T> implements AutoCloseable {
 
     private volatile T instance = null;
