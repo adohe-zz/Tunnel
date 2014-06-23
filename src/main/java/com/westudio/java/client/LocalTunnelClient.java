@@ -2,6 +2,7 @@ package com.westudio.java.client;
 
 import com.westudio.java.util.Executors;
 import com.westudio.java.util.Factory;
+import com.westudio.java.util.Headers;
 import com.westudio.java.util.Numbers;
 import org.apache.commons.codec.binary.Base64;
 
@@ -11,10 +12,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.*;
+import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class LocalTunnelClient {
 
+    private static final int SEGMENT_SIZE = 32758;
     private static final String URL_STRING = "http://localhost/direct-tunnel/";
     private static final String AUTH = "USERNAME:PASSWORD";
 
@@ -43,6 +46,13 @@ public class LocalTunnelClient {
 
     private static SocketFactory sf;
 
+    private static void onRecvLocal(InputStream is, OutputStream os) {
+        byte[] buffer = new byte[SEGMENT_SIZE + 10];
+        buffer[4] = '\r';
+        buffer[5] = '\n';
+
+    }
+
     private static void connect(final Socket socket) {
         try (
           Socket socket_ = sf.createSocket(host, port);
@@ -60,8 +70,15 @@ public class LocalTunnelClient {
 
             // write the header
             os.write(header.getBytes());
+            HashMap<String, String> headers = Headers.generateHeaders(is);
+            Headers.checkHeaders(headers);
 
+            Executors.execute(new Runnable() {
+                @Override
+                public void run() {
 
+                }
+            });
         } catch (IOException e) {
 
         }

@@ -41,4 +41,21 @@ public class Headers {
             sb.setLength(0);
         }
     }
+
+    public static void checkHeaders(HashMap<String, String> headers) throws IOException {
+        String statusLine = headers.get("");
+
+        if (statusLine == null) {
+            throw new IOException("response status error");
+        }
+
+        String[] ss = statusLine.split(" ", 3);
+        if (ss.length != 3) {
+            throw new IOException("response status error");
+        }
+
+        if (Numbers.parseInt(ss[1]) != 200) {
+            throw new IOException("response status " + ss[2]);
+        }
+    }
 }
