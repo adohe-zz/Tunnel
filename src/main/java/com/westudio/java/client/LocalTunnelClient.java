@@ -40,7 +40,7 @@ public class LocalTunnelClient {
             "Host: %s:%s\r\n" +
             "Destination: %s\r\n" +
             "Authorization: Basic %s\r\n" +
-            "\r\n2\r\n\0\0\r\n";;
+            "\r\n2\r\n\0\0\r\n";
 
     private static AtomicBoolean running = new AtomicBoolean(true);
 
@@ -50,6 +50,21 @@ public class LocalTunnelClient {
         byte[] buffer = new byte[SEGMENT_SIZE + 10];
         buffer[4] = '\r';
         buffer[5] = '\n';
+
+        while (true) {
+            int len = 0;
+            try {
+                len = is.read(buffer, 8, SEGMENT_SIZE);
+            } catch (IOException e) {/**/}
+            if (len == 0) {
+            }
+
+            if (len < 0) {
+                break;
+            }
+
+
+        }
 
     }
 
