@@ -20,6 +20,8 @@ public class LocalTunnelClient {
     private static final int SEGMENT_SIZE = 32758;
     private static final String URL_STRING = "http://localhost/direct-tunnel/";
     private static final String AUTH = "USERNAME:PASSWORD";
+    private static final String HEX_DIGITS = "0123456789ABCDEF";
+    private static final byte[] CHUNK_END = "0\r\n\r\n".getBytes();
 
     private static String host;
     private static String path;
@@ -46,26 +48,44 @@ public class LocalTunnelClient {
 
     private static SocketFactory sf;
 
-    private static void onRecvLocal(InputStream is, OutputStream os) {
+    private static void onRecvLocal(InputStream is, OutputStream os) throws IOException {
         byte[] buffer = new byte[SEGMENT_SIZE + 10];
         buffer[4] = '\r';
         buffer[5] = '\n';
 
+        long lastSent = System.currentTimeMillis();
         while (true) {
+            long now = System.currentTimeMillis();
             int len = 0;
+
             try {
                 len = is.read(buffer, 8, SEGMENT_SIZE);
             } catch (IOException e) {/**/}
             if (len == 0) {
+                if (now > lastSent + 15000) {
+                    lastSent = now;
+                }
+                continue;
             }
 
             if (len < 0) {
                 break;
             }
 
-
+            int chunkSize = len + 2;
+            buffer[0] = (byte)HEX_DIGITS.charAt(chunkSize >> 12);
+            buffer[1] = (byte)HEX_DIGITS.charAt((chunkSize >> 8) & 0xF);
+            buffer[2] = (byte)HEX_DIGITS.charAt((chunkSize >> 4) & 0xF);
+            buffer[3] = (byte)HEX_DIGITS.charAt(chunkSize & 0xF);
+            buffer[6] = (byte)(len >> 8);
+            buffer[7] = (byte)(len & 0xFF);
+            buffer[len + 8] = '\r';
+            buffer[len + 9] = '\n';
+            os.write(buffer, 0 , len + 10);
+            lastSent = now;
         }
 
+        os.write(CHUNK_END);
     }
 
     private static void connect(final Socket socket) {
@@ -91,12 +111,24 @@ public class LocalTunnelClient {
             Executors.execute(new Runnable() {
                 @Override
                 public void run() {
-
+                    try {
+                        onRecvLocal(socket.getInputStream(), os);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
         } catch (IOException e) {
 
         }
+    }
+
+    private static void onRecvRemote(InputStream is, OutputStream os) {
+
+    }
+
+    private static void onRecvRemoteChunked(InputStream is, OutputStream os) {
+
     }
 
     public static void main(String[] args) {
