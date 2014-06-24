@@ -22,6 +22,7 @@ public class LocalTunnelClient {
     private static final String AUTH = "USERNAME:PASSWORD";
     private static final String HEX_DIGITS = "0123456789ABCDEF";
     private static final byte[] CHUNK_END = "0\r\n\r\n".getBytes();
+    private static final byte[] EMPTY_CHUNK = {'2', '\r', '\n', 0, 0, '\r', '\n'};
 
     private static String host;
     private static String path;
@@ -64,6 +65,7 @@ public class LocalTunnelClient {
             if (len == 0) {
                 if (now > lastSent + 15000) {
                     lastSent = now;
+                    os.write(EMPTY_CHUNK);
                 }
                 continue;
             }
@@ -113,9 +115,7 @@ public class LocalTunnelClient {
                 public void run() {
                     try {
                         onRecvLocal(socket.getInputStream(), os);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    } catch (IOException e) {/**/}
                 }
             });
         } catch (IOException e) {
@@ -123,11 +123,43 @@ public class LocalTunnelClient {
         }
     }
 
-    private static void onRecvRemote(InputStream is, OutputStream os) {
+    private static void onRecvRemote(InputStream is, OutputStream os) throws IOException {
+        byte[] buffer = new byte[SEGMENT_SIZE];
+        int b0;
+        int b1;
 
+        while ((b0 = is.read()) >= 0 && (b1 = is.read()) >= 0) {
+            int len = b0 << 8 + b1;
+
+            if (len == 0) {
+                // Heart beat
+                continue;
+            }
+
+            if (len > SEGMENT_SIZE) {
+                break;
+            }
+
+            int offset = 0;
+            while (len > 0) {
+                int bytesRead = is.read(buffer, offset, len);
+
+                if (bytesRead < 0) {
+                    break;
+                }
+
+                offset += bytesRead;
+                len -= bytesRead;
+            }
+
+            os.write(buffer, 0, offset);
+        }
     }
 
     private static void onRecvRemoteChunked(InputStream is, OutputStream os) {
+        byte[] buffer = new byte[SEGMENT_SIZE];
+        int len = 0;
+
 
     }
 
