@@ -118,9 +118,13 @@ public class LocalTunnelClient {
                     } catch (IOException e) {/**/}
                 }
             });
-        } catch (IOException e) {
 
-        }
+            if ("chunked".equals(headers.get("Transfer-Encoding"))) {
+                onRecvRemoteChunked(is, os);
+            } else {
+                onRecvRemote(is, os);
+            }
+        } catch (IOException e) {/**/}
     }
 
     private static void onRecvRemote(InputStream is, OutputStream os) throws IOException {
