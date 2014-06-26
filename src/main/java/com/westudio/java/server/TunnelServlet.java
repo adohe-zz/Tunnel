@@ -7,12 +7,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
 
 public abstract class TunnelServlet extends HttpServlet {
 
     private String auth;
 
+    protected ExecutorService executor;
     protected abstract void doTunnel(HttpServletRequest req, HttpServletResponse res);
+
+    protected static final int DEFAULT_TIMEOUT = 1000;
 
     @Override
     public void init() throws ServletException {
