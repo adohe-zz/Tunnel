@@ -14,7 +14,7 @@ public class DirectTunnelServlet extends TunnelServlet {
     private static final int DEFAULT_SEGMENT_SIZE = 32758;
     private static final byte[] EMPTY_CHUNK = {0, 0};
 
-    private void onRecvRemote(InputStream is, OutputStream os) throws IOException {
+    private static void onRecvRemote(InputStream is, OutputStream os) throws IOException {
         byte[] buffer  = new byte[DEFAULT_SEGMENT_SIZE + 2];
         long lastSent = 0;
         while (true) {
@@ -46,8 +46,12 @@ public class DirectTunnelServlet extends TunnelServlet {
         }
     }
 
+    private static void onRecvClient(InputStream is, OutputStream os) {
+        byte[] buffer = new byte[DEFAULT_SEGMENT_SIZE];
+    }
+
     @Override
-    protected void doTunnel(HttpServletRequest req, HttpServletResponse res) {
+    protected void doTunnel(HttpServletRequest req, final HttpServletResponse res) {
         String destination = res.getHeader("Destination");
         int c = 0;
 
@@ -60,7 +64,7 @@ public class DirectTunnelServlet extends TunnelServlet {
 
         int port = Numbers.parseInt(destination.substring(c + 1));
         String host = destination.substring(0, c);
-        final Socket socket;
+        Socket socket = null;
 
         try {
             socket = new Socket(host, port);
@@ -73,12 +77,17 @@ public class DirectTunnelServlet extends TunnelServlet {
             }
         }
 
+        final Socket socket_ = socket;
         executor.execute(new Runnable() {
             @Override
             public void run() {
-
+                try {
+                    onRecvRemote(socket_.getInputStream(), res.getOutputStream());
+                } catch (IOException e) {/**/}
             }
         });
+
+
     }
 
 }
