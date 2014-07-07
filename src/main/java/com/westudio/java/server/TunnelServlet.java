@@ -32,18 +32,18 @@ public abstract class TunnelServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
         String authorization = req.getHeader("Authorization");
 
         if (auth == null || (authorization != null &&
             authorization.toUpperCase().startsWith("BASIC")) &&
             authorization.substring(6).equals(auth)) {
-            doTunnel(req, resp);
+            doTunnel(req, res);
         }  else {
-            resp.setHeader("WWW-Authenticate",
+            res.setHeader("WWW-Authenticate",
                     "Basic realm=\"Pegasus Tunnel\"");
-            resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         }
     }
 }

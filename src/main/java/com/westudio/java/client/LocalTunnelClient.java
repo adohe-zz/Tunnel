@@ -92,6 +92,7 @@ public class LocalTunnelClient {
 
     private static void connect(final Socket socket) {
         try (
+          // Connect the Tunnel Server Servlet
           Socket socket_ = sf.createSocket(host, port);
           InputStream is = new BufferedInputStream(socket_.getInputStream());
           OutputStream os = socket_.getOutputStream();
@@ -182,7 +183,7 @@ public class LocalTunnelClient {
         }
 
         host = url.getHost();
-        port = url.getPort() < 0 ? url.getDefaultPort() : url.getPort();
+        port = url.getPort() < 0 ? url.getDefaultPort() : url.getPort(); //FIXME?
         path = url.getPath();
 
         sf = Factory.getSocketFactory("HTTPS".equals(url.getProtocol()));
