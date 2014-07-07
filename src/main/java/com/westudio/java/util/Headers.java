@@ -30,12 +30,13 @@ public class Headers {
                 return headers;
             }
 
-            int index = sb.indexOf(":");
+            String str = sb.toString();
+            int index = str.indexOf(": ");
             if (index < 0) {
                 // HTTP/1.1 200 OK
-                headers.put("", sb.toString());
+                headers.put("", str);
             } else {
-                headers.put(sb.toString().substring(0, index), sb.toString().substring(index + 2));
+                headers.put(str.substring(0, index), str.substring(index + 2));
             }
 
             sb.setLength(0);
