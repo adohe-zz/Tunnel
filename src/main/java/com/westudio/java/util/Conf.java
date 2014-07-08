@@ -4,6 +4,10 @@ import sun.misc.Signal;
 import sun.misc.SignalHandler;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 public class Conf {
 
@@ -32,5 +36,18 @@ public class Conf {
         }
 
         return false;
+    }
+
+    public static Logger openLogger(String name, int limit, int count) {
+        Logger logger = Logger.getAnonymousLogger();
+        logger.setLevel(Level.INFO);
+        logger.setUseParentHandlers(false);
+
+        FileHandler handler = null;
+
+        handler.setLevel(Level.INFO);
+        handler.setFormatter(new SimpleFormatter());
+        logger.addHandler(handler);
+        return logger;
     }
 }
