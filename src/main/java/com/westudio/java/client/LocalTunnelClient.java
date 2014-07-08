@@ -1,9 +1,6 @@
 package com.westudio.java.client;
 
-import com.westudio.java.util.Executors;
-import com.westudio.java.util.Factory;
-import com.westudio.java.util.Headers;
-import com.westudio.java.util.Numbers;
+import com.westudio.java.util.*;
 import org.apache.commons.codec.binary.Base64;
 
 import javax.net.SocketFactory;
@@ -169,6 +166,10 @@ public class LocalTunnelClient {
     }
 
     public static void main(String[] args) {
+
+        if (Conf.handleShutdown(LocalTunnelClient.class, args, running)) {
+            return;
+        }
 
         if (args == null || args.length < 3) {
             return;
