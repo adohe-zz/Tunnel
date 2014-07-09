@@ -7,6 +7,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
 public abstract class TunnelServlet extends HttpServlet {
@@ -16,6 +20,8 @@ public abstract class TunnelServlet extends HttpServlet {
     protected ExecutorService executor;
 
     protected static final int DEFAULT_TIMEOUT = 1000;
+
+    protected Set<InputStream> ins = Collections.newSetFromMap(new ConcurrentHashMap<InputStream, Boolean>());
 
     protected abstract void doTunnel(HttpServletRequest req, HttpServletResponse res);
 
