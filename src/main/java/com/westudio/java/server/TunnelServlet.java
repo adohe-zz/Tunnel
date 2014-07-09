@@ -14,9 +14,10 @@ public abstract class TunnelServlet extends HttpServlet {
     private String auth;
 
     protected ExecutorService executor;
-    protected abstract void doTunnel(HttpServletRequest req, HttpServletResponse res);
 
     protected static final int DEFAULT_TIMEOUT = 1000;
+
+    protected abstract void doTunnel(HttpServletRequest req, HttpServletResponse res);
 
     @Override
     public void init() throws ServletException {
