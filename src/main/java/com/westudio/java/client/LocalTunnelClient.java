@@ -180,12 +180,11 @@ public class LocalTunnelClient {
         try {
             url = new URL(URL_STRING);
         } catch (MalformedURLException e) {
-            e.printStackTrace();
             return;
         }
 
         host = url.getHost();
-        port = url.getPort() < 0 ? url.getDefaultPort() : url.getPort(); //FIXME?
+        port = url.getPort() < 0 ? url.getDefaultPort() : url.getPort();
         path = url.getPath();
 
         sf = Factory.getSocketFactory("HTTPS".equals(url.getProtocol()));
@@ -214,8 +213,13 @@ public class LocalTunnelClient {
                     });
                 }
             } catch (IOException e) {
+            }
 
+            if (!running.get()) {
+                break;
             }
         }
+
+        Executors.shutdown();
     }
 }

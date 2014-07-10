@@ -21,7 +21,7 @@ public abstract class Lazy<T> implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         synchronized (this) {
             if (instance != null) {
                 T instance_ = instance;

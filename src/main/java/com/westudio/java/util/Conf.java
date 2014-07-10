@@ -50,4 +50,8 @@ public class Conf {
         logger.addHandler(handler);
         return logger;
     }
+
+    public static void closeLogger(Logger logger) {
+
+    }
 }

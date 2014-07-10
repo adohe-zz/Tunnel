@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 public class Executors {
 
     private static final int POOL_SIZE = 50;
+
     private static LinkedBlockingDeque<Runnable> queue = new LinkedBlockingDeque<>();
 
     private static Lazy<ThreadPoolExecutor> executor = new Lazy<ThreadPoolExecutor>() {
@@ -29,5 +30,9 @@ public class Executors {
 
     public static void execute(Runnable runnable) {
         executor.getInstance().execute(runnable);
+    }
+
+    public static void shutdown() {
+        executor.close();
     }
 }
