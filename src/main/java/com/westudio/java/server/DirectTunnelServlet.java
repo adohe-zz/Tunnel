@@ -119,11 +119,19 @@ public class DirectTunnelServlet extends TunnelServlet {
             }
         });
 
+        InputStream in = null;
         try {
-            onRecvClient(req.getInputStream(), socket.getOutputStream());
+            in = req.getInputStream();
+            ins.add(in);
+            onRecvClient(in, socket.getOutputStream());
         } catch (IOException e) {
         } finally {
+            if (in != null) {
+                ins.remove(in);
+            }
         }
+
+        // Evade resource leak warning
         closeSocket(socket);
     }
 
