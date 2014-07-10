@@ -7,6 +7,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
 public abstract class TunnelServlet extends HttpServlet {
@@ -14,9 +18,12 @@ public abstract class TunnelServlet extends HttpServlet {
     private String auth;
 
     protected ExecutorService executor;
-    protected abstract void doTunnel(HttpServletRequest req, HttpServletResponse res);
 
     protected static final int DEFAULT_TIMEOUT = 1000;
+
+    protected Set<InputStream> ins = Collections.newSetFromMap(new ConcurrentHashMap<InputStream, Boolean>());
+
+    protected abstract void doTunnel(HttpServletRequest req, HttpServletResponse res);
 
     @Override
     public void init() throws ServletException {
@@ -32,18 +39,18 @@ public abstract class TunnelServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
         String authorization = req.getHeader("Authorization");
 
         if (auth == null || (authorization != null &&
             authorization.toUpperCase().startsWith("BASIC")) &&
             authorization.substring(6).equals(auth)) {
-            doTunnel(req, resp);
+            doTunnel(req, res);
         }  else {
-            resp.setHeader("WWW-Authenticate",
+            res.setHeader("WWW-Authenticate",
                     "Basic realm=\"Pegasus Tunnel\"");
-            resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         }
     }
 }
