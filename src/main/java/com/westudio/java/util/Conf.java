@@ -21,7 +21,7 @@ public class Conf {
         SignalHandler handler = new SignalHandler() {
             @Override
             public void handle(Signal signal) {
-
+                running.set(false);
             }
         };
 
