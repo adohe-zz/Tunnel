@@ -132,6 +132,7 @@ public class LocalTunnelClient {
         int b0;
         int b1;
 
+
         while ((b0 = is.read()) >= 0 && (b1 = is.read()) >= 0) {
             int len = b0 << 8 + b1;
 
