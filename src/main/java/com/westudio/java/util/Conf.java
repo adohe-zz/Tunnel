@@ -48,6 +48,7 @@ public class Conf {
         handler.setLevel(Level.INFO);
         handler.setFormatter(new SimpleFormatter());
         logger.addHandler(handler);
+
         return logger;
     }
 

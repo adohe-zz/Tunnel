@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import java.net.*;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Logger;
 
 public class LocalTunnelClient {
 
@@ -168,6 +169,7 @@ public class LocalTunnelClient {
 
     public static void main(String[] args) {
 
+        // Handle shutdown
         if (Conf.handleShutdown(LocalTunnelClient.class, args, running)) {
             return;
         }
@@ -183,11 +185,17 @@ public class LocalTunnelClient {
             return;
         }
 
+        // Servlet location
         host = url.getHost();
         port = url.getPort() < 0 ? url.getDefaultPort() : url.getPort();
         path = url.getPath();
 
+        destination = args[1] + ":" + args[2];
+
         sf = Factory.getSocketFactory("HTTPS".equals(url.getProtocol()));
+
+        // Open logger
+        Logger logger = Log.getAndSet(Conf.openLogger("LocalForward", 16, 10));
 
         while (true) {
             try (ServerSocket server = new ServerSocket(Numbers.parseInt(args[0]))) {
@@ -213,6 +221,8 @@ public class LocalTunnelClient {
                     });
                 }
             } catch (IOException e) {
+                Log.w(e.getMessage());
+            } catch (Error | RuntimeException e) {
             }
 
             if (!running.get()) {
