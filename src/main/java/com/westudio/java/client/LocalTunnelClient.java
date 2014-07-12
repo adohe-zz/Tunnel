@@ -223,13 +223,19 @@ public class LocalTunnelClient {
             } catch (IOException e) {
                 Log.w(e.getMessage());
             } catch (Error | RuntimeException e) {
+                Log.e(e.getMessage());
             }
 
             if (!running.get()) {
                 break;
             }
+
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {/**/}
         }
 
         Executors.shutdown();
+        Conf.closeLogger(logger);
     }
 }

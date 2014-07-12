@@ -33,4 +33,16 @@ public class Log {
     public static void w(String msg, Throwable t) {
         log(Level.WARNING, t, msg);
     }
+
+    public static void e(String msg) {
+        log(Level.SEVERE, null, msg);
+    }
+
+    public static void e(Throwable t) {
+        log(Level.SEVERE, t, null);
+    }
+
+    public static void e(String msg, Throwable t) {
+        log(Level.SEVERE, t, msg);
+    }
 }
