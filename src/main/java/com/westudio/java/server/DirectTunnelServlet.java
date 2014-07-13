@@ -83,7 +83,7 @@ public class DirectTunnelServlet extends TunnelServlet {
 
     @Override
     protected void doTunnel(HttpServletRequest req, final HttpServletResponse res) {
-        String destination = res.getHeader("Destination");
+        String destination = req.getHeader("Destination");
         int c = 0;
 
         if (destination == null || (c = destination.indexOf(":")) < 0) {
