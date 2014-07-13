@@ -47,6 +47,12 @@ public class LocalTunnelClient {
 
     private static SocketFactory sf;
 
+    private static void close(final Socket socket) {
+        try {
+            socket.close();
+        } catch (IOException e) {/**/}
+    }
+
     private static void onRecvLocal(InputStream is, OutputStream os) throws IOException {
         byte[] buffer = new byte[SEGMENT_SIZE + 10];
         buffer[4] = '\r';
@@ -98,10 +104,10 @@ public class LocalTunnelClient {
             String header = null;
             if (AUTH == null) {
                 header = String.format(NO_AUTH_HEADER, path,
-                        host, port, destination);
+                        host, "" + port, destination);
             } else {
                 header = String.format(path, host,
-                        port, destination, new String(Base64.encodeBase64(AUTH.getBytes())));
+                        "" + port, destination, new String(Base64.encodeBase64(AUTH.getBytes())));
             }
 
             // write the header
@@ -119,11 +125,12 @@ public class LocalTunnelClient {
             });
 
             if ("chunked".equals(headers.get("Transfer-Encoding"))) {
-                onRecvRemoteChunked(is, os);
+                onRecvRemoteChunked(is, socket.getOutputStream());
             } else {
-                onRecvRemote(is, os);
+                onRecvRemote(is, socket.getOutputStream());
             }
         } catch (IOException e) {/**/}
+        close(socket);
     }
 
     private static void onRecvRemote(InputStream is, OutputStream os) throws IOException {
