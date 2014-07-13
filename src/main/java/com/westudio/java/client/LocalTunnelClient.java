@@ -98,10 +98,10 @@ public class LocalTunnelClient {
             String header = null;
             if (AUTH == null) {
                 header = String.format(NO_AUTH_HEADER, path,
-                        host, port, "");
+                        host, port, destination);
             } else {
                 header = String.format(path, host,
-                        port, "", new String(Base64.encodeBase64(AUTH.getBytes())));
+                        port, destination, new String(Base64.encodeBase64(AUTH.getBytes())));
             }
 
             // write the header
